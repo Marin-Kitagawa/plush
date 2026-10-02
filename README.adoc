@@ -1,333 +1,316 @@
-= plush
+= Plush: A cozy little extension
 
 image::plush.png[]
 
-= Plush — Cozy Volume, Speed & Find
 :toc: left
-:toclevels: 3
-:sectnums:
+:toclevels: 2
+:toc-title: 🧺 what's inside
 :sectanchors:
 :experimental:
-:source-highlighter: highlight.js
+:note-caption: 🫖 teatime note
+:tip-caption: 🌷 soft tip
+:caution-caption: 🌧 gentle caution
+:important-caption: 💌 little but important
+:warning-caption: 🕯 careful, love
 :revnumber: 1.0.0
 :keywords: chrome-extension, volume-boost, playback-speed, regex-find
 
+[.center]
+----
+      ) )
+     ( (
+   ._______.
+   |       |]
+   \       /
+    `-----'
+----
+
 [.lead]
-Plush is a small Chrome extension that does three unglamorous jobs with an
-unreasonable amount of charm: it amplifies audio up to *600%*, locks video
-playback anywhere from *0.25×* to *16.00×*, and replaces kbd:[Ctrl+F] with a
-real regex-powered page search — all wrapped in cream paper, dusty rose, and
-a teacup that steams faster as you crank the volume.
+Plush is a small Chrome extension that does three unglamorous jobs in the
+softest way it knows how: it turns the volume up to *600%*, carries video from
+a sleepy *0.25×* to a breathless *16.00×*, and replaces kbd:[Ctrl+F] with a
+real regex-powered search. It wears cream paper and dusty rose, and keeps a
+teacup whose steam quickens as you crank the volume — because useful things
+deserve nice things too.
 
-This document doubles as the user manual and the developer reference.
+This little book is the user manual and the developer reference in one. Make
+yourself comfortable; there is tea.
 
-== Overview
+[.center]
+✿ ✿ ✿
+
+== 🌸 a warm welcome
 
 * *Volume boost* — real amplification (a Web Audio `GainNode`), not the
-  browser's volume slider. Applies to every `<video>` and `<audio>` element on
-  an ordinary web page, including players added after page load and players
-  tucked inside open shadow roots.
-* *Playback speed* — sets `playbackRate` up to Chromium's absolute ceiling of
-  16.00× and *keeps* it there, snapping it back whenever a site's player tries
-  to reset it.
-* *Regex find* — a floating search bar with full regular-expression support,
-  live match counting, keyboard navigation, and non-destructive highlighting
-  (the page's DOM is never modified).
+  browser's volume slider. Every `<video>` and `<audio>` on an ordinary page,
+  including players that arrive late and players hiding in open shadow roots.
+* *Playback speed* — `playbackRate` from 0.25× up to Chromium's ceiling of
+  16.00×, held there gently but firmly against sites that like to snap it back.
+* *Regex find* — a floating search bar with full regular expressions, live
+  match counting, keyboard hopping, and highlighting that never touches the
+  page's DOM.
 
-Everything is *per-tab*: a 600% / 16× session never leaks into other tabs, and
-navigating or reloading a tab resets it to calm defaults.
+Everything is *per-tab*: a 600% / 16× afternoon never leaks into other tabs,
+and navigating away tucks everything back in.
 
-NOTE: Plush requests only the `storage` permission, collects nothing, and its
-own code makes no network requests (see <<privacy>> for the one font exception).
+[.center]
+✿ ✿ ✿
 
 [[requirements]]
-== Requirements
+== 🫖 what you'll need
 
-Browser:: Any Chromium-based browser version 106 or newer — Chrome, Edge,
-Brave, Opera, Vivaldi, Arc. Firefox and Safari are not supported (Manifest V3
-service worker; Chromium audio behaviour).
+Browser:: Any Chromium browser, version 106 or newer — Chrome, Edge, Brave,
+Opera, Vivaldi, Arc. Firefox and Safari are not invited (Manifest V3 service
+worker; Chromium audio behaviour).
 Platform:: Windows, macOS, or Linux.
 Privileges:: `storage` (remembers your last find pattern) and content-script
-injection on `<all_urls>` (media discovery, find highlighting). Nothing else.
-Disk:: Five small files. No build step, no bundler, no runtime dependencies
-except two optional Google Fonts with graceful fallbacks.
+injection on `<all_urls>`. Nothing else — Plush is a light packer.
+Disk:: Five small files. No build step, no bundler, no dependencies except
+two optional Google Fonts with graceful fallbacks.
+
+[.center]
+✿ ✿ ✿
 
 [[install]]
-== Installation
+== 🧶 tucking it in
 
-=== Load it unpacked
+=== into Chrome
 
-. Create a folder named `plush` containing the five files (<<file-layout>>).
+. Make a folder named `plush` holding the five files (<<file-layout>>).
 . Open `chrome://extensions`.
 . Toggle *Developer mode* (top right).
-. Click *Load unpacked* and select the folder.
-. Optional: pin Plush from the puzzle-piece menu so the teacup is always one
-  click away.
+. Click *Load unpacked* and pick the folder.
+. Pin Plush from the puzzle-piece menu, so the teacup is always one click away.
 
-=== Allow access to file URLs (optional)
-
-Under `chrome://extensions` → *Plush* → *Details*, enable *Allow access to
-file URLs* if you want boost, speed, and find to work on `file://` pages.
+Under *Details*, enabling *Allow access to file URLs* lets boost, speed, and
+find visit `file://` pages too.
 
 IMPORTANT: Content scripts are not injected into tabs that were *already open*
-when the extension was installed or reloaded. Reload any tab you want Plush to
-visit.
+when Plush moved in. Reload any tab you'd like it to visit.
 
 [[file-layout]]
-=== File layout
+=== the five little files
 
 ----
 plush/
-├── manifest.json     Extension manifest (Manifest V3)
-├── background.js     Service worker — badge painting, Alt+Shift+F relay
-├── content.js        Per-tab engine — audio graph, speed lock, find bar
-├── popup.html        Toolbar popup — the dressing-table card itself
-└── popup.js          Popup logic — sliders, chips, pattern box
+├── manifest.json     the label on the jam jar
+├── background.js     service worker — paints the badge, relays alt+shift+F
+├── content.js        the per-tab engine — audio graph, speed lock, find bar
+├── popup.html        the dressing-table card itself
+└── popup.js          sliders, chips, and the pattern box
 ----
 
 [[quickstart]]
-== Quick start
+== 🍒 three sweet things, quickly
 
 . Open any page with a video.
-. Click the Plush icon, drag *volume* to 600% and *speed* to 16.00.
-. Press kbd:[Ctrl+F], type `\d{4}`, press kbd:[Enter] — you are now hopping
-  between every four-digit number on the page.
+. Click the teacup; drag *volume* to 600% and *speed* to 16.00.
+. Press kbd:[Ctrl+F], type `\d{4}`, press kbd:[Enter] — and hop between every
+  four-digit number on the page like a very small detective.
 
 [[tour]]
-== A tour of the popup
+== 🪞 the dressing-table tour
 
-Teacup:: The mascot. Its steam quickens as volume rises: one wisp every 3.6 s
+Teacup:: The mascot. Its steam quickens with the volume: one wisp every 3.6 s
 at 100%, tightening to 1.1 s at 600%.
-Status pill:: `ready` when the page's top frame answered Plush's handshake;
-`napping` otherwise.
+Status pill:: `ready` when the page answered Plush's little hello; `napping`
+otherwise.
 Volume:: Slider (100–600, step 5) plus quick chips (100 / 200 / 400 / 600).
 Squiggle divider:: A hand-drawn wobble between sections. It does nothing. It
 is essential.
 Pressed flower:: Whirls at your chosen tempo — one turn per 11 ÷ speed
 seconds, so 16× is a 0.7-second blur.
 Speed:: Slider (0.25–16.00, step 0.05) plus chips (1 / 1.5 / 2 / 4 / 8 / 16).
-Find:: A pattern box. Press kbd:[Enter] or the magnifier: the find bar opens
-in the page and the popup closes itself.
+Find:: A pattern box. kbd:[Enter] or the magnifier opens the bar in the page
+and the popup closes itself, shyly.
 Footer:: The small print — audio naps past ~4× speed; everything stays in its
 own tab.
 
-When the status pill says *napping*, the controls grey out and a small card
-explains itself. See <<napping>>.
+When the pill says *napping*, the controls grey out and a small card explains
+itself. See <<napping>>.
+
+[.center]
+✿ ✿ ✿
 
 [[volume-feature]]
-== Feature guide — volume boost
+== 🎀 volume — turning it all the way up
 
-=== What "600%" means
+=== what "600%" means
 
 100% is untouched audio. Above that, Plush routes each media element through a
 Web Audio graph and multiplies sample amplitude — 600% is a gain of 6.0, a
-genuine boost rather than nudging the element's `volume` property to its 1.0
-maximum.
+genuine boost rather than nudging the element's `volume` property against its
+1.0 maximum.
 
-=== Using it
+=== using it
 
-* Drag the slider or click a chip. The value pulses; the steam quickens.
-* The toolbar badge shows the current state per tab — `600%` while boosting,
-  `2.5×` when only speed is set. When both are active, the volume percentage
-  wins the badge.
+Drag the slider or click a chip; the value pulses and the steam quickens. The
+toolbar badge shows the state per tab — `600%` while boosting, `2.5×` when
+only speed is set. When both are active, the percentage wins the badge.
 
-=== What it applies to
+=== who it visits
 
 `<video>` and `<audio>` elements, discovered three ways: an initial scan at
-page idle, a `MutationObserver` that picks up players added later (250 ms
+page idle, a `MutationObserver` that greets players added later (250 ms
 debounce), and a 3-second sweep as a safety net. Discovery descends into open
 shadow roots and runs in every frame, so embedded cross-origin players are
 covered too.
 
-TIP: Browsers suspend audio contexts until the user interacts with the page.
-If boost seems inert right after load, click the page once — Plush listens for
-gestures and resumes on its own.
+TIP: Browsers suspend audio contexts until the page is touched. If boost
+seems shy right after load, click the page once — Plush listens for gestures
+and wakes on its own.
 
 CAUTION: 600% amplifies everything, including peaks the original mix never
 expected. Distortion on hot signals is physics, not a bug — and mind your
-ears and speakers.
+ears and your speakers.
 
 [[speed-feature]]
-== Feature guide — playback speed
+== 🌼 speed — the pressed-flower waltz
 
-=== Using it
+=== using it
 
 Drag the slider (0.25–16.00) or click a chip. The flower keeps the tempo; the
-badge shows the rate when boost is idle (e.g. `2.5×`).
+badge shows the rate while boost rests.
 
-=== The lock
+=== the lock
 
 Every discovered element gets a `ratechange` guard: the moment a site's player
-moves the rate more than 0.01 away from your setting, Plush snaps it back.
-Players discovered *later* inherit the current setting automatically. Clicking
-the `1` chip releases the lock and explicitly restores every element to 1.00.
+strays more than 0.01 from your setting, Plush tucks it back. Players that
+arrive *later* inherit the setting automatically. The `1` chip releases the
+lock and walks every element home to 1.00.
 
-NOTE: 16.00× is a hard Chromium ceiling — no extension can exceed it.
-NOTE: Chromium itself silences audio above roughly 4× playback speed. Boost
-cannot recover what the browser refuses to mix. Use ≤4× when you want sound.
+NOTE: 16.00× is a hard Chromium ceiling — no extension may go beyond.
+NOTE: Chromium itself silences audio above roughly 4×. Boost cannot recover
+what the browser refuses to mix. Stay ≤4× when you want sound.
 
 [[find-feature]]
-== Feature guide — regex find
+== 🔎 find — the little detective
 
-=== Opening the bar
+=== opening the bar
 
+._three ways in_
 [cols="2,3",options="header"]
 |===
-|Route |How
+|route |how
 
-|In-page (default)
-|kbd:[Ctrl+F] — kbd:[Cmd+F] on macOS. The native find bar is suppressed.
+|in-page (default)
+|kbd:[Ctrl+F] — kbd:[Cmd+F] on macOS. The native bar politely steps aside.
 
-|Command (rebindable)
+|command (rebindable)
 |kbd:[Alt+Shift+F]. Rebind at `chrome://extensions/shortcuts`.
 
-|From the popup
+|from the popup
 |Type a pattern in the *find* box, press kbd:[Enter] or the magnifier.
 |===
 
-=== Reading the bar
+=== reading the bar
 
 A heart, an italic *plush find*, then four buttons: `Aa` (case toggle), prev,
-next, close. Below, the input; below that, a status line that shows a hint
+next, close. Below, the input; below that, a status line offering a hint
 ("type a pattern · enter jumps"), the live count ("3 / 87", or "3 / 2000+"
-when truncated), or the regex engine's error message verbatim.
+when truncated), or the regex engine's complaint, verbatim.
 
-=== Two ways to write a pattern
+=== two ways to write a pattern
 
-Bare form:: The whole string is a regular expression, e.g. `\d{4}`. Matching
-is case-sensitive by default; the `Aa` button switches to case-insensitive.
-Literal form:: `/pattern/flags`, e.g. `/colou?r/i`, for explicit flags.
+Bare form:: The whole string is a regular expression — `\d{4}`. Matching is
+case-sensitive by default; the `Aa` button switches to ignore-case.
+Literal form:: `/pattern/flags` — `/colou?r/i` — when you'd like to choose
+flags yourself.
 
-Supported flags:
-
+._the little flags_
 [cols="1,3,4",options="header"]
 |===
-|Flag |Meaning |Notes
+|flag |meaning |notes
 
-|`g`
-|global
-|Always forced on — Plush finds *all* matches.
-
-|`i`
-|ignore case
-|Added and removed by the `Aa` toggle.
-
-|`m`
-|multiline
-|`^` and `$` match line boundaries.
-
-|`s`
-|dotall
-|`.` matches newlines.
-
-|`u`
-|unicode
-|Full code-point matching.
-
-|`v`
-|unicode sets
-|Modern set operations.
-
-|`d`
-|indices
-|Accepted; harmless — the highlighter doesn't use indices.
-
-|`y`
-|sticky
-|Stripped — sticky scanning would hide matches.
+|`g` |global |Always forced on — Plush finds *all* the matches.
+|`i` |ignore case |Added and removed by the `Aa` toggle.
+|`m` |multiline |`^` and `$` meet line boundaries.
+|`s` |dotall |`.` makes friends with newlines.
+|`u` |unicode |Full code-point matching.
+|`v` |unicode sets |Modern set operations.
+|`d` |indices |Accepted; harmless — the highlighter doesn't use indices.
+|`y` |sticky |Politely declined — sticky scanning would hide matches.
 |===
 
-=== Navigation
+=== hopping between matches
 
-* kbd:[Enter] — next match. kbd:[Shift+Enter] — previous. Both wrap around.
-* kbd:[Esc] or the close button dismisses the bar and clears highlights.
-* The chosen match scrolls to about 38% from the top of the viewport.
+kbd:[Enter] is next, kbd:[Shift+Enter] is previous; both wrap around.
+kbd:[Esc] or the close button dismisses the bar and sweeps the highlights
+away. The chosen match settles at about 38% from the top of the viewport.
 
-=== What gets searched
+=== what gets searched
 
-All visible text nodes of the top frame, except inside `SCRIPT`, `STYLE`,
+All visible text of the top frame, except inside `SCRIPT`, `STYLE`,
 `NOSCRIPT`, `TEXTAREA`, `TEMPLATE`, `IFRAME`, `OBJECT`, `EMBED`, `SVG`,
-`MATH`, `CANVAS`, `HEAD`, `TITLE`, `OPTION`, and `SELECT` — i.e. code,
-invisible plumbing, and editable fields are skipped. Shadow DOM (open or
-closed) and iframes are not searched; media control works in frames, find
-does not.
+`MATH`, `CANVAS`, `HEAD`, `TITLE`, `OPTION`, and `SELECT` — code, invisible
+plumbing, and editable fields are skipped. Shadow DOM and iframes are not
+searched; media control works in frames, find does not.
 
-=== Non-destructive highlighting
+=== highlights that leave no fingerprints
 
 Highlights are absolutely-positioned rectangles in a dedicated overlay layer
-pinned to *document coordinates*: they ride along when you scroll and never
-enter the page's DOM, so React, Vue, and friends never notice. The overlay
-re-measures itself when the DOM changes (~350 ms debounce) or the window
+pinned to *document coordinates* — they ride along when you scroll and never
+enter the page's DOM, so React, Vue, and friends never notice a thing. The
+overlay re-measures itself when the DOM changes (~350 ms) or the window
 resizes (~200 ms).
 
-=== Limits and timing
+=== limits & timing
 
-`MAX_MATCHES` of 2000 matched ranges and `MAX_RECTS` of 6000 painted
-rectangles per scan (the count reads `2000+` when truncated). Typing re-runs
-the search after 160 ms of quiet.
+2000 matched ranges and 6000 painted rectangles per scan (the count reads
+`2000+` when truncated). Typing re-runs the search after 160 ms of quiet.
 
-=== Pattern cookbook
+=== 🍪 the pattern cookbook
 
 `\d{4}`:: four-digit runs — years, ports, timestamps
-`/colou?r/i`:: colour, color, COLOUR — the literal form, case-insensitive
+`/colou?r/i`:: colour, color, COLOUR — the literal form
 `https?://\S+`:: URLs
-`\b(TODO|FIXME)\b`:: work items (alternation)
+`\b(TODO|FIXME)\b`:: work items, hiding
 `\b\d{1,3}(\.\d{1,3}){3}\b`:: IPv4 addresses
 `[A-Z]{4,}`:: THINGS WRITTEN LIKE THIS
 
-=== The last pattern is remembered
+=== the pattern under her pillow
 
-The pattern is saved to `chrome.storage.local` under the key `findPattern`
-when the bar closes and when launched from the popup; the popup re-fills the
-box next time. Local to your profile only.
+The last pattern is saved to `chrome.storage.local` under `findPattern` when
+the bar closes and when launched from the popup; the popup re-fills the box
+next time. It never leaves your machine.
+
+[.center]
+✿ ✿ ✿
 
 [[shortcuts]]
-== Keyboard shortcuts
+== ⌨️ little keys
 
+._a pocketful of shortcuts_
 [cols="2,2,4",options="header"]
 |===
-|Keys |Where |Action
+|keys |where |action
 
-|kbd:[Ctrl+F] / kbd:[Cmd+F]
-|page (top frame)
-|Open plush find; the native find bar is suppressed.
-
-|kbd:[Alt+Shift+F]
-|browser
-|Open plush find. Rebindable at `chrome://extensions/shortcuts`.
-
-|kbd:[Enter]
-|find input
-|Next match.
-
-|kbd:[Shift+Enter]
-|find input
-|Previous match.
-
-|kbd:[Esc]
-|page
-|Close the bar and clear highlights.
+|kbd:[Ctrl+F] / kbd:[Cmd+F] |page (top frame) |Open plush find; native bar suppressed.
+|kbd:[Alt+Shift+F] |browser |Open plush find. Rebindable.
+|kbd:[Enter] |find input |Next match.
+|kbd:[Shift+Enter] |find input |Previous match.
+|kbd:[Esc] |page |Close the bar, clear highlights.
 |===
 
 [[scope]]
-== Scope & lifecycle
+== 🌙 scope, naps & bedtime
 
 * Settings are strictly per-tab. Navigation or reload resets them to 100% and
-  1×, and the service worker clears the badge.
-* `content.js` runs in *all frames*. Boost and speed are broadcast to every
-  frame; the handshake and find go to the top frame only.
+  1×, and the badge is smoothed away.
+* `content.js` runs in *all frames*. Boost and speed are whispered to every
+  frame; the hello and the find bar belong to the top frame only.
 * The `ratechange` lock and the audio graph attach to elements as they appear,
   for as long as the tab lives.
 
 [[napping]]
 Pages where Plush cannot run — `chrome://` and `edge://` pages, the Chrome Web
-Store, other extensions' pages, and the PDF viewer — show the *napping* card
-in the popup instead of controls. This is a browser boundary, not a bug.
+Store, other extensions' pages, the PDF viewer — show the *napping* card in
+the popup instead of controls. A browser boundary, not a mood.
 
 [[dev]]
-== Developer reference
+== 🧵 for the curious — how it's stitched
 
-=== Architecture
+=== the shape of it
 
 ----
 ┌────────────────┐  boost / speed (all frames)   ┌────────────────────┐
@@ -347,125 +330,85 @@ in the popup instead of controls. This is a browser boundary, not a bug.
 ----
 
 Three surfaces, cleanly separated: the popup never touches the page, the
-content script never draws UI outside its own find bar, and the service
-worker only paints badges and relays the `Alt+Shift+F` command.
+content script draws nothing beyond its own find bar, and the service worker
+only paints badges and relays kbd:[Alt+Shift+F].
 
-=== Message protocol
-
+._who says what to whom_
 [cols="1,2,2,4",options="header"]
 |===
-|`type` |From ▸ To |Payload |What happens
+|`type` |from ▸ to |payload |what happens
 
-|`hello`
-|popup ▸ top frame
-|—
-|Replies `{ok:true, boost, speed}` (boost as a whole-number percent). A reply
-means the tab is alive; silence means *napping*.
-
-|`boost`
-|popup ▸ every frame
-|`value` — percent, 100–600
-|Clamped to a gain of 0–6, applied to all discovered media, badge updated.
-
-|`speed`
-|popup ▸ every frame
-|`value` — rate, 0.25–16
-|Clamped to 0.0625–16 and locked onto all discovered media. A value of `1`
-releases the lock and resets elements.
-
-|`find`
-|popup ▸ top frame
-|`pattern` — regex string
-|Opens the find bar pre-filled; the popup closes itself.
-
-|`badge`
-|content ▸ service worker
-|`text` — badge string
-|Paints the toolbar badge (#C96F5E). Cleared by the worker on navigation.
+|`hello` |popup ▸ top frame |— |Replies `{ok:true, boost, speed}`. A reply
+means the tab is awake; silence means *napping*.
+|`boost` |popup ▸ every frame |`value` — percent, 100–600 |Clamped to a gain
+of 0–6, applied to all discovered media, badge updated.
+|`speed` |popup ▸ every frame |`value` — rate, 0.25–16 |Clamped to
+0.0625–16 and locked on. A value of `1` releases and resets.
+|`find` |popup ▸ top frame |`pattern` — regex string |Opens the bar
+pre-filled; the popup excuses itself.
+|`badge` |content ▸ worker |`text` — badge string |Paints the toolbar badge
+(#C96F5E). Cleared on navigation.
 |===
 
-=== Media discovery
+=== finding the players
 
-`findMedia()` walks a root, collecting `video`/`audio` elements and recursing
-into open `shadowRoot`s. A `MutationObserver` re-scans added nodes on a 250 ms
-debounce; a 3-second interval sweeps for anything missed. On first touch, each
-element gets a `ratechange` guard installed.
+`findMedia()` walks a root collecting `video`/`audio` elements and recursing
+into open `shadowRoot`s. A `MutationObserver` re-scans added nodes on a
+250 ms debounce; a 3-second interval sweeps up stragglers. First touch
+installs each element's `ratechange` guard.
 
-=== The audio graph
+=== the audio graph
 
-Per element, one graph: `MediaElementSource → GainNode → destination`, cached
+One graph per element: `MediaElementSource → GainNode → destination`, cached
 in a `WeakMap` as `{ctx, gain}` — or `{failed}` if construction threw, so
-broken elements are skipped without retrying forever. Routing an element
-through the source node is the whole mechanism: once connected, its audio
-flows only through the graph, and `gain.value` is your multiplier. Suspended
-contexts are resumed on the first gesture (`pointerdown`, `keydown`,
-`touchstart`, capture, passive). EME-protected (DRM) sources throw on
-`createMediaElementSource` and are permanently unboostable for that page load.
+broken elements aren't retried forever. Routing through the source node is
+the whole mechanism: once connected, audio flows only through the graph, and
+`gain.value` is your multiplier. Suspended contexts are resumed on the first
+gesture (`pointerdown`, `keydown`, `touchstart`). EME-protected (DRM) sources
+throw on `createMediaElementSource` and stay unboostable for that page load.
 
-=== The speed lock
+=== the speed lock
 
-Applying speed writes `playbackRate` if it differs by more than 0.01; the
-guard rewrites any later deviation. Releasing at `1` resets every discovered
-element explicitly.
+Applying speed writes `playbackRate` when it differs by more than 0.01; the
+guard rewrites any later deviation. Releasing at `1` resets everything found.
 
-=== Find internals
+=== find internals
 
-Styles are installed via `CSSStyleSheet` + `adoptedStyleSheets` (immune to
-page CSP) with a `<style>` fallback; the Google Fonts link is best-effort and
-silently degrades to system fonts under strict CSP or offline. Scanning uses a
-`TreeWalker` over text nodes with the skip-list from <<find-feature>>. Each
-match becomes a `Range`; its `getClientRects()` become overlay divs positioned
-at `clientRect + scroll offsets` inside a layer at `z-index: 2147483646`
-(pointer-events: none, multiply blend), with the active match tinted and
-ringed. Re-scans fire on the 160 ms input debounce, on foreign DOM mutations
-(350 ms — mutations inside Plush's own layer or bar are ignored), and on
-resize (200 ms). Regex input is normalized: the literal `/…/flags` form is
-detected, flags are de-duplicated, `g` is forced, `y` is stripped.
+Styles arrive via `CSSStyleSheet` + `adoptedStyleSheets` (immune to page CSP)
+with a `<style>` fallback; the Google Fonts link is best-effort and degrades
+to system stacks offline or under strict CSP. Scanning is a `TreeWalker` over
+text nodes with the skip-list from <<find-feature>>. Each match becomes a
+`Range`; its `getClientRects()` become overlay divs at `clientRect + scroll`
+inside a layer at `z-index: 2147483646` (pointer-events: none, multiply
+blend), the active match tinted and ringed. Re-scans fire on the 160 ms input
+debounce, on foreign DOM mutations (350 ms — Plush's own nodes are ignored),
+and on resize (200 ms). Input is normalized: the literal `/…/flags` form is
+detected, flags de-duplicated, `g` forced, `y` stripped.
 
-=== Storage
-
+._the one thing remembered_
 [cols="2,2,4",options="header"]
 |===
-|Key |Type |Purpose
+|key |type |purpose
 
-|`findPattern`
-|string
-|The last regex, written when the bar closes or the popup launches a search;
-reloaded into the popup's pattern box.
+|`findPattern` |string |The last regex, reloaded into the popup's box.
 |===
 
 [[custom]]
-== Customization
+== 🎨 make it yours
 
-=== Recolor the card
+=== repaint the card
 
-Edit the `:root` variables in `popup.html`:
+The palette lives in the `:root` block of `popup.html`: `--card` (paper),
+`--blush`/`--blush2` (fills and borders), `--rose`/`--rose-d` (accents),
+`--cocoa`/`--cocoa2`/`--faint` (text, muted, faintest). The find bar's colors
+sit in the CSS string near the top of `find` in `content.js`:
+`.plush-hl` (passive, `rgba(222,124,105,.34)`) and `.plush-hl-on` (active,
+`rgba(236,183,94,.75)` plus the ring).
 
-[cols="2,4",options="header"]
-|===
-|Variable |Role
-
-|`--card`
-|paper background
-
-|`--blush`, `--blush2`
-|tinted fills and borders
-
-|`--rose`, `--rose-d`
-|accents and deep accents
-
-|`--cocoa`, `--cocoa2`, `--faint`
-|text, muted text, faintest text
-|===
-
-The find bar's palette lives in the CSS string near the top of `find` in
-`content.js`: `.plush-hl` (passive highlight, `rgba(222,124,105,.34)`) and
-`.plush-hl-on` (active highlight, `rgba(236,183,94,.75)` plus the ring).
-
-=== Give Ctrl+F back to Chrome
+=== give kbd:[Ctrl+F] back to Chrome
 
 Delete this listener near the bottom of `content.js`; the popup and
-kbd:[Alt+Shift+F] keep working:
+kbd:[Alt+Shift+F] carry on without it.
 
 [source,js]
 ----
@@ -480,24 +423,18 @@ document.addEventListener('keydown', e => {
 }, true);
 ----
 
-=== Make the Aa button mean "match case"
+=== flip the Aa button's heart
 
-As shipped, matching is case-sensitive by default and the `Aa` toggle switches
-to *ignore*-case. If you prefer the conventional mapping (lit = case
-sensitive, insensitive default), change one ternary and one initializer:
+As shipped, matching is case-sensitive and `Aa` switches to *ignore*-case.
+For the conventional mapping, one ternary and one initializer:
 
 [source,js]
 ----
-// before (lit = ignore case)
-let caseOn = false;
-const fl = caseOn ? 'i' : '';
-
-// after (lit = match case)
-let caseOn = true;
-const fl = caseOn ? '' : 'i';
+let caseOn = false;            // → true
+const fl = caseOn ? 'i' : '';  // → (caseOn ? '' : 'i')
 ----
 
-=== Raise the ceilings
+=== raise the ceilings
 
 [source,js]
 ----
@@ -505,117 +442,105 @@ const fl = caseOn ? '' : 'i';
 boost = Math.min(10, Math.max(0, (Number(msg.value) || 100) / 100));
 
 // content.js — bigger find scans
-const MAX_MATCHES = 2000, MAX_RECTS = 6000;   // raise freely; memory is the cost
+const MAX_MATCHES = 2000, MAX_RECTS = 6000;   // memory is the only cost
 ----
 
 Also set `max="1000"` on the volume slider in `popup.html`, and update the
-track-fill math in `popup.js` from `(v - 100) / 5` to `(v - 100) / 9` for the
-new 100–1000 span.
+track-fill math in `popup.js` from `(v - 100) / 5` to `(v - 100) / 9`.
 
-WARNING: Beyond ~800%, most material is indistinguishable from a hedge trimmer.
-Clipping is guaranteed; treat anything past 600% as a curiosity.
+WARNING: Past ~800%, most material is indistinguishable from a hedge
+trimmer. Clipping is guaranteed; treat anything beyond 600% as a curiosity.
 
-=== Ideas for forks
+=== ideas for little forks
 
 * Persist boost/speed across navigation via `chrome.storage.session`.
-* Per-site presets (YouTube always 2×, docs always muted).
-* Iframe-aware find and a match-replace mode.
+* Per-site presets — YouTube always 2×, docs always hushed.
+* Iframe-aware find, and a match-replace mode.
 * A "midnight linen" dark theme.
 * An options page with a pattern history.
 
 [[limitations]]
-== Limitations & known issues
+== 🌧 when things go sideways
 
 DRM / EME media:: Netflix, Disney+, and friends cannot be boosted — the audio
 graph cannot attach to protected streams. Speed usually still works.
 Above ~4× speed:: Chromium mutes audio. A browser rule, not a setting.
-16× ceiling:: Hard-coded in Chromium; unreachable for any extension.
+16× ceiling:: Hard-coded in Chromium; unreachable for anyone.
 Per-tab reset:: By design. Nothing persists across navigation.
-Find and frames:: Matches inside iframes and shadow DOM are not found; the
-bar itself exists only in the top frame.
+Find and frames:: Matches inside iframes and shadow DOM stay hidden; the bar
+itself lives only in the top frame.
 Closed shadow roots:: Media inside them is invisible to any content script —
 no boost, no speed.
-Fixed-position text:: Highlights are document-coordinate. If fixed text moves
-without a DOM mutation, its highlight can drift until the next re-scan;
-editing the pattern forces one.
+Fixed-position text:: Highlights are document-coordinate; fixed text that
+moves without a DOM mutation can drift until the next re-scan. Editing the
+pattern forces one.
 Fonts:: Offline or CSP-strict pages fall back to system stacks. Cosmetic only.
 
 [[troubleshooting]]
-== Troubleshooting
+== 🩹 small mends
 
+._gently does it_
 [cols="2,2,3",options="header"]
 |===
-|Symptom |Likely cause |Remedy
+|symptom |likely cause |remedy
 
-|Popup says *napping* on a normal page
-|Tab predates install/update
-|Reload the tab.
-
-|Slider moves, no audible change
-|DRM media, or context still suspended
-|Click the page once. DRM streams cannot be boosted.
-
-|Crackling at high boost
-|Amplification clipping on a hot signal
-|Expected. Lower the slider.
-
-|Sound vanishes at 8×
-|Chromium's ~4× audio cutoff
-|Use ≤4× when you need to hear it.
-
-|No effect on one specific site's player
-|Player lives in a closed shadow root
-|Not reachable by content scripts; nothing to do.
-
-|kbd:[Ctrl+F] does nothing
-|Napping page, or focus sits in an embedded viewer
-|Try kbd:[Alt+Shift+F].
-
-|Badge disappeared
-|Tab navigated; badges clear on load
-|Nudge a slider to re-set it.
-
-|Typefaces look plain
-|Fonts blocked or offline
-|Cosmetic only; fallback stacks in use.
+|Popup says *napping* on a normal page |Tab predates install/update |Reload the tab.
+|Slider moves, no sound |DRM media, or context suspended |Click the page once. DRM can't be boosted.
+|Crackling at high boost |Amplification clipping |Expected. Lower the slider.
+|Sound vanishes at 8× |Chromium's ~4× audio cutoff |Stay ≤4× when you want to hear it.
+|One site's player ignores you |Player in a closed shadow root |Unreachable by content scripts; nothing to do.
+|kbd:[Ctrl+F] does nothing |Napping page, or focus in an embedded viewer |Try kbd:[Alt+Shift+F].
+|Badge vanished |Tab navigated; badges clear on load |Nudge a slider.
+|Typefaces look plain |Fonts blocked or offline |Cosmetic only.
 |===
 
 [[faq]]
-== FAQ
+== 💌 little questions, answered
 
 Does Plush change settings for the whole browser?:: No — strictly per tab.
 Is anything sent to a server?:: No. The only stored data is your last find
-pattern, in local extension storage.
-Why did kbd:[Ctrl+F] stop opening Chrome's bar?:: By design. Restore it via
-<<custom>> or disable the extension.
-Can boost exceed 600%?:: The code clamps at 6.0; raising it is covered in
-<<custom>>, with a warning you should read first.
-Does speed work on YouTube? Netflix?:: Yes and usually yes — but never boost
-on DRM sites.
+pattern, in local storage.
+Why did kbd:[Ctrl+F] stop opening Chrome's bar?:: On purpose. Restore it via
+<<custom>>, or disable the extension.
+Can boost exceed 600%?:: The code clamps at 6.0; raising it is in <<custom>>,
+with a warning worth reading first.
+Does speed work on YouTube? Netflix?:: Yes, and usually — but never boost on
+DRM sites.
 Can it search *and* replace?:: Find only.
-Where is my pattern stored?:: `chrome.storage.local`, key `findPattern`, on
+Where is my pattern kept?:: `chrome.storage.local`, key `findPattern`, on
 your machine only.
 Is there a mobile version?:: No — desktop Chromium only.
 
 [[privacy]]
-== Privacy
+== 🔒 privacy, softly
 
-* Plush's own code makes no network requests and has no analytics.
-* The single external fetch is a Google Fonts stylesheet for Fraunces and
-  Quicksand, loaded by the popup and (best-effort) by the find bar. Offline or
-  CSP-strict, it is skipped and system fonts are used. Privacy maximalists can
-  delete the two font links without losing any functionality.
-* Page content is read only to locate media elements and find matches. Nothing
-  is logged, transmitted, or stored beyond the `findPattern` key.
+* Plush's own code makes no network requests and keeps no analytics.
+* The single external fetch is a Google Fonts stylesheet (Fraunces and
+  Quicksand), loaded by the popup and, best-effort, by the find bar. Offline
+  or CSP-strict, it is skipped. Privacy maximalists may delete the two font
+  links and lose nothing functional.
+* Page content is read only to locate media and find matches. Nothing is
+  logged, transmitted, or stored beyond `findPattern`.
 
 [[uninstall]]
-== Uninstalling
+== 👋 goodbye for now
 
-`chrome://extensions` → Plush → *Remove*. The one stored find pattern is
-deleted with it. Any tab left at 600% / 16× resets on its next navigation.
+`chrome://extensions` → Plush → *Remove*. The one stored pattern is deleted
+with it, and any tab left at 600% / 16× settles down on its next navigation.
+Thank you for having Plush over. ♡
+
+[.center]
+----
+   .:::.   .:::.
+  :::::::.:::::::
+  ':::::::::::::'
+    ':::::::'
+      ':::
+       '
+----
 
 [[appendix-manifest]]
-== Appendix A: The manifest
+== 📎 appendix a — the manifest, in full
 
 [source,json]
 ----
@@ -647,102 +572,43 @@ deleted with it. Any tab left at 600% / 16× resets on its next navigation.
 
 [cols="2,4",options="header"]
 |===
-|Key |Why it is what it is
+|key |why
 
-|`minimum_chrome_version: 106`
-|Declared floor for the APIs the find bar relies on.
-
-|`permissions: ["storage"]`
-|The only permission — remembers the last find pattern.
-
-|`all_frames: true`
-|So embedded players in iframes are discovered and controlled.
-
-|`run_at: document_idle`
-|Media scan runs after the page has settled.
-
-|`commands.open-find`
-|Backs kbd:[Alt+Shift+F]; rebindable by the user.
+|`minimum_chrome_version: 106` |Floor for the APIs the find bar relies on.
+|`permissions: ["storage"]` |The only permission — remembers the last pattern.
+|`all_frames: true` |Embedded players in iframes get discovered too.
+|`run_at: document_idle` |The media scan runs after the page settles.
+|`commands.open-find` |Backs kbd:[Alt+Shift+F]; yours to rebind.
 |===
 
 [[appendix-constants]]
-== Appendix B: Knobs & constants
+== 🍬 appendix b — all the little knobs
 
+._the dials on the inside_
 [cols="2,2,2,4",options="header"]
 |===
-|Constant |File |Default |Meaning
+|constant |file |default |meaning
 
-|`MAX_MATCHES`
-|content.js
-|2000
-|Upper bound on matched ranges per scan.
-
-|`MAX_RECTS`
-|content.js
-|6000
-|Upper bound on painted highlight rectangles.
-
-|input debounce
-|content.js
-|160 ms
-|Quiet period after typing before a re-scan.
-
-|reflow debounce
-|content.js
-|350 ms
-|Re-scan delay after foreign DOM mutations.
-
-|resize debounce
-|content.js
-|200 ms
-|Re-measure delay on window resize.
-
-|mutation debounce
-|content.js
-|250 ms
-|Media re-discovery delay after nodes are added.
-
-|sweep interval
-|content.js
-|3000 ms
-|Safety-net scan for media the observer missed.
-
-|boost clamp
-|content.js
-|0–6
-|Gain ceiling (6 = 600%).
-
-|speed clamp
-|content.js
-|0.0625–16
-|Rate bounds accepted from messages.
-
-|badge colour
-|background.js
-|#C96F5E
-|Dusty-rose badge background.
-
-|scroll anchor
-|content.js
-|38%
-|Where the chosen match lands, vertically.
-
-|steam period
-|popup.html
-|3.6 → 1.1 s
-|Teacup animation follows the volume slider.
-
-|flower period
-|popup.html
-|11 ÷ speed s
-|Bloom's spin follows the speed slider.
+|`MAX_MATCHES` |content.js |2000 |Matched ranges per scan.
+|`MAX_RECTS` |content.js |6000 |Painted highlight rectangles.
+|input debounce |content.js |160 ms |Quiet after typing before re-scan.
+|reflow debounce |content.js |350 ms |Re-scan after foreign DOM mutations.
+|resize debounce |content.js |200 ms |Re-measure on window resize.
+|mutation debounce |content.js |250 ms |Media re-discovery after new nodes.
+|sweep interval |content.js |3000 ms |Safety-net scan.
+|boost clamp |content.js |0–6 |Gain ceiling (6 = 600%).
+|speed clamp |content.js |0.0625–16 |Rate bounds from messages.
+|badge colour |background.js |#C96F5E |Dusty-rose badge.
+|scroll anchor |content.js |38% |Where the chosen match settles.
+|steam period |popup.html |3.6 → 1.1 s |Teacup follows the volume slider.
+|flower period |popup.html |11 ÷ speed s |Bloom's spin follows speed.
 |===
 
 [[changelog]]
-== Appendix C: Release notes
+== 🌱 appendix c — a tiny history
 
 1.0.0:: First public teacup. 600% Web Audio boost with per-element graphs and
 failure marking; 16.00× speed lock with `ratechange` guard; regex find with
 overlay highlighting, case toggle, literal flag form, truncation counting,
-reflow re-measurement, `Ctrl+F` / `Alt+Shift+F` entry, and `findPattern`
-persistence.
+reflow re-measurement, kbd:[Ctrl+F] / kbd:[Alt+Shift+F] entry, and
+`findPattern` persistence.
