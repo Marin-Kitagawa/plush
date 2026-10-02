@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Plush</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --card:#FFFDF8; --blush:#F7E4D9; --blush2:#F0D3C5;
+    --rose:#D97A6C; --rose-d:#B4574A;
+    --cocoa:#4A342E; --cocoa2:#97796D; --faint:#C7A89A;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ background:var(--card); }
+  body{
+    width:352px; color:var(--cocoa);
+    font-family:'Quicksand',ui-rounded,'Trebuchet MS',sans-serif;
+    background-image:radial-gradient(rgba(217,122,108,.08) 1px, transparent 1.4px);
+    background-size:15px 15px;
+    user-select:none;
+  }
+
+  /* ---------- header ---------- */
+  header{ display:flex; align-items:center; gap:12px; padding:16px 18px 13px; border-bottom:1.5px dashed var(--blush2); }
+  .cup{ flex:none; }
+  h1{ font-family:'Fraunces',Georgia,serif; font-style:italic; font-weight:650; font-size:27px; line-height:.95; letter-spacing:.3px; }
+  .ttl p{ margin-top:5px; font-size:10px; font-weight:700; letter-spacing:2.6px; text-transform:uppercase; color:var(--cocoa2); }
+  .status{ margin-left:auto; display:flex; align-items:center; gap:6px; padding:5px 11px 5px 9px; border-radius:99px;
+    background:var(--blush); border:1px solid var(--blush2); font-size:11px; font-weight:700; color:var(--rose-d); }
+  .status i{ width:7px; height:7px; border-radius:50%; background:var(--rose); animation:ping 2.4s ease-out infinite; }
+  .status em{ font-style:normal; }
+  @keyframes ping{ 0%{box-shadow:0 0 0 0 rgba(217,122,108,.5);} 70%,100%{box-shadow:0 0 0 7px rgba(217,122,108,0);} }
+
+  /* ---------- napping page ---------- */
+  #nap{ padding:14px 18px 4px; display:flex; flex-direction:column; gap:3px; font-size:12.5px; font-weight:700; color:var(--rose-d); }
+  #nap span{ font-weight:600; font-size:11px; color:var(--cocoa2); }
+  body.nap main, body.nap footer{ opacity:.32; pointer-events:none; filter:grayscale(.5); }
+  body.nap .status{ color:var(--cocoa2); }
+  body.nap .status i{ background:var(--faint); animation:none; }
+
+  /* ---------- sections ---------- */
+  section{ padding:13px 18px 3px; }
+  .head{ display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+  .lbl{ display:flex; align-items:center; gap:7px; font-size:11.5px; font-weight:700; letter-spacing:1.8px; text-transform:uppercase; }
+  .lbl svg{ color:var(--rose); }
+  .val{ margin-left:auto; display:inline-flex; align-items:baseline; font-family:'Fraunces',Georgia,serif;
+    font-weight:640; font-size:23px; line-height:1; color:var(--rose-d); }
+  .val i{ font-style:normal; font-size:13px; font-weight:600; color:var(--cocoa2); margin-left:1px; }
+  .tag{ margin-left:auto; font-size:10px; font-weight:700; letter-spacing:.6px; color:var(--faint); text-transform:uppercase; }
+  #bloom{ flex:none; }
+
+  .sq{ display:block; width:calc(100% - 36px); height:12px; margin:1px 18px; color:#EFD3C4; }
+
+  /* ---------- sliders ---------- */
+  input[type=range]{ -webkit-appearance:none; appearance:none; width:100%; height:24px; background:transparent; cursor:pointer; }
+  input[type=range]::-webkit-slider-runnable-track{ height:9px; border-radius:99px;
+    background:linear-gradient(to right, var(--rose) var(--fill,0%), var(--blush) var(--fill,0%));
+    box-shadow:inset 0 1px 3px rgba(122,70,58,.2); }
+  input[type=range]::-webkit-slider-thumb{ -webkit-appearance:none; width:21px; height:21px; margin-top:-6px; border-radius:50%;
+    background:var(--card); border:2.5px solid var(--rose); box-shadow:0 2px 7px rgba(150,70,58,.35); transition:transform .15s ease; }
+  input[type=range]:active::-webkit-slider-thumb{ transform:scale(1.18); }
+  input[type=range]:focus-visible{ outline:2px solid var(--rose); outline-offset:4px; border-radius:99px; }
+
+  /* ---------- chips ---------- */
+  .chips{ display:flex; gap:7px; padding:2px 0 12px; }
+  .chips button{ flex:1; padding:6.5px 0; border-radius:11px; border:1.5px solid var(--blush2); background:var(--blush);
+    color:var(--cocoa); font-family:inherit; font-size:11.5px; font-weight:700; cursor:pointer; transition:.15s ease; }
+  .chips button:hover{ border-color:var(--rose); color:var(--rose-d); transform:translateY(-1.5px); }
+  .chips button.on{ background:var(--rose); border-color:var(--rose); color:#fff; box-shadow:0 3px 9px rgba(180,87,74,.35); }
+
+  /* ---------- find ---------- */
+  .findrow{ display:flex; gap:8px; }
+  #pattern{ flex:1; min-width:0; padding:10px 13px; border-radius:13px; border:1.5px solid var(--blush2); background:var(--blush);
+    font-family:inherit; font-size:13px; font-weight:600; color:var(--cocoa); outline:none; transition:.16s ease; }
+  #pattern::placeholder{ color:var(--faint); }
+  #pattern:focus{ border-color:var(--rose); background:#fff; box-shadow:0 0 0 3.5px rgba(217,122,108,.15); }
+  #go{ flex:none; width:42px; border:0; border-radius:13px; background:var(--rose); color:#fff; display:grid; place-items:center;
+    cursor:pointer; box-shadow:0 4px 11px rgba(180,87,74,.35); transition:.15s ease; }
+  #go:hover{ background:var(--rose-d); transform:translateY(-1.5px); }
+  .note{ padding:9px 1px 12px; font-size:10.8px; font-weight:600; color:var(--cocoa2); }
+  .note b{ color:var(--rose-d); font-weight:700; }
+
+  footer{ display:flex; align-items:center; gap:7px; margin-top:2px; padding:10px 18px 14px; border-top:1.5px dashed var(--blush2);
+    font-size:10.5px; font-weight:600; color:var(--faint); }
+  footer svg{ color:var(--rose); opacity:.7; flex:none; }
+
+  /* ---------- mascots ---------- */
+  .steam path{ opacity:0; animation:steam var(--steam-d,3s) ease-in-out infinite; }
+  .steam .s2{ animation-delay:calc(var(--steam-d,3s)*.34); }
+  .steam .s3{ animation-delay:calc(var(--steam-d,3s)*.67); }
+  @keyframes steam{ 0%{opacity:0; transform:translateY(3px);} 30%{opacity:.9;} 100%{opacity:0; transform:translateY(-4.5px);} }
+  #bloomG{ transform-origin:20px 20px; animation:whirl var(--dur,11s) linear infinite; }
+  @keyframes whirl{ to{ transform:rotate(360deg); } }
+</style>
+</head>
+<body>
+  <header>
+    <svg class="cup" width="46" height="41" viewBox="0 0 48 42" aria-hidden="true">
+      <g class="steam" fill="none" stroke="#D97A6C" stroke-width="2.1" stroke-linecap="round">
+        <path class="s1" d="M17.5 13.5c-2.2-2.6 2.2-4 0-7.5"/>
+        <path class="s2" d="M24.5 12.5c2.2-2.6-2.2-4 0-7.5"/>
+        <path class="s3" d="M31.5 13.5c-2.2-2.6 2.2-4 0-7.5"/>
+      </g>
+      <path d="M9 17.5h27v4c0 6.6-6.1 11.3-13.5 11.3S9 28.1 9 21.5v-4z" fill="#F7E4D9" stroke="#D97A6C" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M36 20h2.6c3.1 0 4.8 3.6 2.6 5.9-1.1 1.2-3.1 1.7-5 1.4" fill="none" stroke="#D97A6C" stroke-width="2" stroke-linecap="round"/>
+      <path d="M13 37h21" stroke="#E4B9A8" stroke-width="2.4" stroke-linecap="round"/>
+      <ellipse cx="22.5" cy="17.5" rx="13.5" ry="2.6" fill="#FFFDF8" stroke="#D97A6C" stroke-width="2"/>
+    </svg>
+    <div class="ttl">
+      <h1>Plush</h1>
+      <p>volume · speed · find</p>
+    </div>
+    <span class="status"><i></i><em id="statusTxt">ready</em></span>
+  </header>
+
+  <div id="nap" hidden>
+    <b>this page is napping</b>
+    <span>plush only visits ordinary web pages — try again on one of those</span>
+  </div>
+
+  <main>
+    <section>
+      <div class="head">
+        <span class="lbl"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>volume</span>
+        <span class="val" id="boostVal">100<i>%</i></span>
+      </div>
+      <input type="range" id="boost" min="100" max="600" step="5" value="100" aria-label="volume boost">
+      <div class="chips" id="boostChips">
+        <button data-v="100">100</button><button data-v="200">200</button><button data-v="400">400</button><button data-v="600">600</button>
+      </div>
+    </section>
+
+    <svg class="sq" viewBox="0 0 320 12" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0 6 q10 -7 20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0"
+            fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+    </svg>
+
+    <section>
+      <div class="head">
+        <span class="lbl"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>speed</span>
+        <svg id="bloom" width="25" height="25" viewBox="0 0 40 40" aria-hidden="true">
+          <g id="bloomG">
+            <g fill="#F2D7CB" stroke="#D97A6C" stroke-width="1.8">
+              <ellipse cx="20" cy="10.5" rx="4.3" ry="8"/>
+              <ellipse cx="20" cy="10.5" rx="4.3" ry="8" transform="rotate(60 20 20)"/>
+              <ellipse cx="20" cy="10.5" rx="4.3" ry="8" transform="rotate(120 20 20)"/>
+              <ellipse cx="20" cy="10.5" rx="4.3" ry="8" transform="rotate(180 20 20)"/>
+              <ellipse cx="20" cy="10.5" rx="4.3" ry="8" transform="rotate(240 20 20)"/>
+              <ellipse cx="20" cy="10.5" rx="4.3" ry="8" transform="rotate(300 20 20)"/>
+            </g>
+          </g>
+          <circle cx="20" cy="20" r="4.4" fill="#B4574A"/>
+        </svg>
+        <span class="val" id="speedVal">1.00<i>×</i></span>
+      </div>
+      <input type="range" id="speed" min="0.25" max="16" step="0.05" value="1" aria-label="playback speed">
+      <div class="chips" id="speedChips">
+        <button data-v="1">1</button><button data-v="1.5">1.5</button><button data-v="2">2</button><button data-v="4">4</button><button data-v="8">8</button><button data-v="16">16</button>
+      </div>
+    </section>
+
+    <svg class="sq" viewBox="0 0 320 12" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0 6 q10 -7 20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0"
+            fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+    </svg>
+
+    <section>
+      <div class="head">
+        <span class="lbl"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>find</span>
+        <span class="tag">regex · replaces ctrl + F</span>
+      </div>
+      <div class="findrow">
+        <input id="pattern" spellcheck="false" placeholder="try  \d{4}  or  /colou?r/i">
+        <button id="go" title="find in page">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg>
+        </button>
+      </div>
+      <p class="note"><b>enter</b> finds it in the page · <b>ctrl + F</b> now opens plush · or <b>alt + shift + F</b></p>
+    </section>
+  </main>
+
+  <footer>
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+    audio naps past ~4× speed · everything stays in its own tab
+  </footer>
+
+<script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "Plush — cozy volume, speed & find",
+  "version": "1.0.0",
+  "description": "A warm little toolkit: 600% volume boost, 16.00× playback on any video, and regex-powered page find.",
+  "minimum_chrome_version": "106",
+  "permissions": ["storage"],
+  "background": { "service_worker": "background.js" },
+  "action": { "default_popup": "popup.html", "default_title": "Plush" },
+  "commands": {
+    "open-find": {
+      "suggested_key": { "default": "Alt+Shift+F" },
+      "description": "Open the Plush find bar"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ]
+}
