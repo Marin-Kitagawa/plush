@@ -1,1 +1,3 @@
 = plush
+
+image::plush.png[]
